@@ -148,14 +148,14 @@ final class Utils
                     $aggregate->reject($reason);
                 }
             }
-        )->then(function () use (&$results) {
+        )->then(function () use (&$results): array {
             ksort($results);
 
             return $results;
         });
 
         if (true === $recursive) {
-            $promise = $promise->then(function ($results) use ($recursive, &$promises) {
+            return $promise->then(function ($results) use ($recursive, &$promises) {
                 foreach ($promises as $promise) {
                     if (Is::pending($promise)) {
                         return self::all($promises, $recursive);
@@ -203,7 +203,7 @@ final class Utils
                 $rejections[] = $reason;
             }
         )->then(
-            function () use (&$results, &$rejections, $count) {
+            function () use (&$results, &$rejections, $count): array {
                 if (count($results) !== $count) {
                     throw new AggregateException(
                         'Not enough promises to fulfill count',
@@ -252,7 +252,7 @@ final class Utils
             function ($reason, $idx) use (&$results): void {
                 $results[$idx] = ['state' => PromiseInterface::REJECTED, 'reason' => $reason];
             }
-        )->then(function () use (&$results) {
+        )->then(function () use (&$results): array {
             ksort($results);
 
             return $results;

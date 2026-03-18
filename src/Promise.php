@@ -223,11 +223,13 @@ class Promise implements PromiseInterface
     {
         if ($this->state !== self::PENDING) {
             return;
-        } elseif ($this->waitFn) {
+        }
+        if ($this->waitFn) {
             $this->invokeWaitFn();
         } elseif ($this->waitList) {
             $this->invokeWaitList();
-        } else {
+        }
+        else {
             // If there's no wait function, then reject the promise.
             $this->reject('Cannot wait on a promise that has '
                 .'no internal wait function. You must provide a wait '
