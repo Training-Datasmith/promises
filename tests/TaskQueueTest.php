@@ -18,7 +18,8 @@ class TaskQueueTest extends TestCase
     public function testKnowsIfFull(): void
     {
         $tq = new TaskQueue(false);
-        $tq->add(function (): void {});
+        $tq->add(function (): void {
+        });
         $this->assertFalse($tq->isEmpty());
     }
 
@@ -26,9 +27,15 @@ class TaskQueueTest extends TestCase
     {
         $tq = new TaskQueue(false);
         $called = [];
-        $tq->add(function () use (&$called): void { $called[] = 'a'; });
-        $tq->add(function () use (&$called): void { $called[] = 'b'; });
-        $tq->add(function () use (&$called): void { $called[] = 'c'; });
+        $tq->add(function () use (&$called): void {
+            $called[] = 'a';
+        });
+        $tq->add(function () use (&$called): void {
+            $called[] = 'b';
+        });
+        $tq->add(function () use (&$called): void {
+            $called[] = 'c';
+        });
         $tq->run();
         $this->assertSame(['a', 'b', 'c'], $called);
     }

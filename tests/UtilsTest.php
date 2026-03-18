@@ -19,9 +19,15 @@ class UtilsTest extends TestCase
     public function testWaitsOnAllPromisesIntoArray(): void
     {
         $e = new \Exception();
-        $a = new Promise(function () use (&$a): void { $a->resolve('a'); });
-        $b = new Promise(function () use (&$b): void { $b->reject('b'); });
-        $c = new Promise(function () use (&$c, $e): void { $c->reject($e); });
+        $a = new Promise(function () use (&$a): void {
+            $a->resolve('a');
+        });
+        $b = new Promise(function () use (&$b): void {
+            $b->reject('b');
+        });
+        $c = new Promise(function () use (&$c, $e): void {
+            $c->reject($e);
+        });
         $results = P\Utils::inspectAll([$a, $b, $c]);
         $this->assertSame([
             ['state' => 'fulfilled', 'value' => 'a'],
@@ -66,8 +72,12 @@ class UtilsTest extends TestCase
         $a->resolve('a');
         $c->resolve('c');
         $d->then(
-            function ($value) use (&$result): void { $result = $value; },
-            function ($reason) use (&$result): void { $result = $reason; }
+            function ($value) use (&$result): void {
+                $result = $value;
+            },
+            function ($reason) use (&$result): void {
+                $result = $reason;
+            }
         );
         P\Utils::queue()->run();
         $this->assertSame(['a', 'b', 'c'], $result);
@@ -102,8 +112,12 @@ class UtilsTest extends TestCase
         $a->reject('fail');
         $c->resolve('c');
         $d->then(
-            function ($value) use (&$result): void { $result = $value; },
-            function ($reason) use (&$result): void { $result = $reason; }
+            function ($value) use (&$result): void {
+                $result = $value;
+            },
+            function ($reason) use (&$result): void {
+                $result = $reason;
+            }
         );
         P\Utils::queue()->run();
         $this->assertSame('fail', $result);
@@ -118,7 +132,9 @@ class UtilsTest extends TestCase
         $b->resolve('b');
         $c->resolve('c');
         $a->resolve('a');
-        $d->then(function ($value) use (&$result): void { $result = $value; });
+        $d->then(function ($value) use (&$result): void {
+            $result = $value;
+        });
         P\Utils::queue()->run();
         $this->assertSame(['b', 'c'], $result);
     }
@@ -142,9 +158,15 @@ class UtilsTest extends TestCase
 
     public function testCanWaitUntilSomeCountIsSatisfied(): void
     {
-        $a = new Promise(function () use (&$a): void { $a->resolve('a'); });
-        $b = new Promise(function () use (&$b): void { $b->resolve('b'); });
-        $c = new Promise(function () use (&$c): void { $c->resolve('c'); });
+        $a = new Promise(function () use (&$a): void {
+            $a->resolve('a');
+        });
+        $b = new Promise(function () use (&$b): void {
+            $b->resolve('b');
+        });
+        $c = new Promise(function () use (&$c): void {
+            $c->resolve('c');
+        });
         $d = P\Utils::some(2, [$a, $b, $c]);
         $this->assertSame(['a', 'b'], $d->wait());
     }
@@ -154,7 +176,9 @@ class UtilsTest extends TestCase
         $this->expectException(AggregateException::class);
         $this->expectExceptionMessage('Not enough promises to fulfill count');
 
-        $a = new Promise(function () use (&$a): void { $a->resolve('a'); });
+        $a = new Promise(function () use (&$a): void {
+            $a->resolve('a');
+        });
         $d = P\Utils::some(2, [$a]);
         $d->wait();
     }
@@ -179,7 +203,9 @@ class UtilsTest extends TestCase
         $c = P\Utils::any([$a, $b]);
         $b->resolve('b');
         $a->resolve('a');
-        $c->then(function ($value) use (&$result): void { $result = $value; });
+        $c->then(function ($value) use (&$result): void {
+            $result = $value;
+        });
         P\Utils::queue()->run();
         $this->assertSame('b', $result);
     }
@@ -195,7 +221,9 @@ class UtilsTest extends TestCase
         $a->reject('a');
         P\Utils::queue()->run();
         $this->assertTrue(P\Is::fulfilled($d));
-        $d->then(function ($value) use (&$result): void { $result = $value; });
+        $d->then(function ($value) use (&$result): void {
+            $result = $value;
+        });
         P\Utils::queue()->run();
         $this->assertSame([
             ['state' => 'rejected', 'reason' => 'a'],
@@ -241,9 +269,13 @@ class UtilsTest extends TestCase
     public function testCanScheduleThunk(): void
     {
         $tramp = P\Utils::queue();
-        $promise = P\Utils::task(function () { return 'Hi!'; });
+        $promise = P\Utils::task(function () {
+            return 'Hi!';
+        });
         $c = null;
-        $promise->then(function ($v) use (&$c): void { $c = $v; });
+        $promise->then(function ($v) use (&$c): void {
+            $c = $v;
+        });
         $this->assertNull($c);
         $tramp->run();
         $this->assertSame('Hi!', $c);
@@ -252,9 +284,13 @@ class UtilsTest extends TestCase
     public function testCanScheduleThunkWithRejection(): void
     {
         $tramp = P\Utils::queue();
-        $promise = P\Utils::task(function (): void { throw new \Exception('Hi!'); });
+        $promise = P\Utils::task(function (): void {
+            throw new \Exception('Hi!');
+        });
         $c = null;
-        $promise->otherwise(function ($v) use (&$c): void { $c = $v; });
+        $promise->otherwise(function ($v) use (&$c): void {
+            $c = $v;
+        });
         $this->assertNull($c);
         $tramp->run();
         $this->assertSame('Hi!', $c->getMessage());
@@ -263,7 +299,9 @@ class UtilsTest extends TestCase
     public function testCanScheduleThunkWithWait(): void
     {
         $tramp = P\Utils::queue();
-        $promise = P\Utils::task(function () { return 'a'; });
+        $promise = P\Utils::task(function () {
+            return 'a';
+        });
         $this->assertSame('a', $promise->wait());
         $tramp->run();
     }
@@ -278,7 +316,9 @@ class UtilsTest extends TestCase
             $value = (yield new FulfilledPromise('a'));
             yield $value.'b';
         });
-        $promise->then(function ($value) use (&$result): void { $result = $value; });
+        $promise->then(function ($value) use (&$result): void {
+            $result = $value;
+        });
         P\Utils::queue()->run();
         $this->assertSame('ab', $result);
     }
@@ -298,7 +338,9 @@ class UtilsTest extends TestCase
                 yield $value.'b';
             }
         });
-        $promise->then(function ($value) use (&$result): void { $result = $value; });
+        $promise->then(function ($value) use (&$result): void {
+            $result = $value;
+        });
         P\Utils::queue()->run();
         $this->assertTrue(P\Is::fulfilled($promise));
         $this->assertSame('ab', $result);
@@ -310,8 +352,12 @@ class UtilsTest extends TestCase
     public function testRejectsParentExceptionWhenException(PromiseInterface $promise): void
     {
         $promise->then(
-            function (): void { $this->fail(); },
-            function ($reason) use (&$result): void { $result = $reason; }
+            function (): void {
+                $this->fail();
+            },
+            function ($reason) use (&$result): void {
+                $result = $reason;
+            }
         );
         P\Utils::queue()->run();
         $this->assertInstanceOf(\Exception::class, $result);
@@ -343,8 +389,12 @@ class UtilsTest extends TestCase
             yield new RejectedPromise('no!');
         });
         $promise->then(
-            function (): void { $this->fail(); },
-            function ($reason) use (&$result): void { $result = $reason; }
+            function (): void {
+                $this->fail();
+            },
+            function ($reason) use (&$result): void {
+                $result = $reason;
+            }
         );
         P\Utils::queue()->run();
         $this->assertInstanceOf(RejectionException::class, $result);
@@ -363,8 +413,12 @@ class UtilsTest extends TestCase
             yield $rej;
         });
         $promise->then(
-            function (): void { $this->fail(); },
-            function ($reason) use (&$result): void { $result = $reason; }
+            function (): void {
+                $this->fail();
+            },
+            function ($reason) use (&$result): void {
+                $result = $reason;
+            }
         );
         $rej->reject('no!');
         P\Utils::queue()->run();
@@ -382,7 +436,9 @@ class UtilsTest extends TestCase
                 throw new \Exception('foo');
             }
         });
-        $promise->otherwise(function ($value) use (&$result): void { $result = $value; });
+        $promise->otherwise(function ($value) use (&$result): void {
+            $result = $value;
+        });
         P\Utils::queue()->run();
         $this->assertTrue(P\Is::rejected($promise));
         $this->assertStringContainsString('foo', $result->getMessage());
@@ -402,7 +458,9 @@ class UtilsTest extends TestCase
                 yield new RejectedPromise('foo');
             }
         });
-        $promise->otherwise(function ($value) use (&$result): void { $result = $value; });
+        $promise->otherwise(function ($value) use (&$result): void {
+            $result = $value;
+        });
         P\Utils::queue()->run();
         $this->assertTrue(P\Is::rejected($promise));
         $this->assertStringContainsString('foo', $result->getMessage());
@@ -426,7 +484,9 @@ class UtilsTest extends TestCase
         }
 
         $promise = $this->createLotsOfSynchronousPromise();
-        $promise->then(function ($v) use (&$r): void { $r = $v; });
+        $promise->then(function ($v) use (&$r): void {
+            $r = $v;
+        });
         P\Utils::queue()->run();
         $this->assertSame(999, $r);
     }
@@ -438,7 +498,9 @@ class UtilsTest extends TestCase
         }
 
         $promise = $this->createLotsOfSynchronousPromise();
-        $promise->then(function ($v) use (&$r): void { $r = $v; });
+        $promise->then(function ($v) use (&$r): void {
+            $r = $v;
+        });
         $this->assertSame(999, $promise->wait());
         $this->assertSame(999, $r);
     }
@@ -469,7 +531,9 @@ class UtilsTest extends TestCase
         }
 
         $promise = $this->createLotsOfFlappingPromise();
-        $promise->then(function ($v) use (&$r): void { $r = $v; });
+        $promise->then(function ($v) use (&$r): void {
+            $r = $v;
+        });
         P\Utils::queue()->run();
         $this->assertSame(999, $r);
     }
@@ -481,7 +545,9 @@ class UtilsTest extends TestCase
         }
 
         $promise = $this->createLotsOfFlappingPromise();
-        $promise->then(function ($v) use (&$r): void { $r = $v; });
+        $promise->then(function ($v) use (&$r): void {
+            $r = $v;
+        });
         $this->assertSame(999, $promise->wait());
         $this->assertSame(999, $r);
     }
@@ -516,7 +582,9 @@ class UtilsTest extends TestCase
         $promises[1]->resolve(1);
         $promises[2]->resolve(2);
 
-        $promise->then(function ($v) use (&$r): void { $r = $v; });
+        $promise->then(function ($v) use (&$r): void {
+            $r = $v;
+        });
         P\Utils::queue()->run();
         $this->assertSame(2, $r);
     }
@@ -555,7 +623,9 @@ class UtilsTest extends TestCase
         });
         $p1->resolve('a');
         $p2->resolve('b');
-        $co->then(function ($value) use (&$result): void { $result = $value; });
+        $co->then(function ($value) use (&$result): void {
+            $result = $value;
+        });
         P\Utils::queue()->run();
         $this->assertSame('b', $result);
     }
@@ -589,7 +659,9 @@ class UtilsTest extends TestCase
         $p3->resolve('c');
         $p4->reject('d');
         $p5->resolve('e');
-        $co->then(function ($value) use (&$result): void { $result = $value; });
+        $co->then(function ($value) use (&$result): void {
+            $result = $value;
+        });
         P\Utils::queue()->run();
         $this->assertSame('e', $result);
     }
@@ -624,7 +696,9 @@ class UtilsTest extends TestCase
             $promises[$i + 3]->resolve($i + 3);
         }
 
-        $co->then(function ($value) use (&$result): void { $result = $value; });
+        $co->then(function ($value) use (&$result): void {
+            $result = $value;
+        });
         P\Utils::queue()->run();
         $this->assertSame(19, $result);
     }
@@ -665,12 +739,24 @@ class UtilsTest extends TestCase
             $this->markTestIncomplete('Broken on HHVM.');
         }
 
-        $p1 = new Promise(function () use (&$p1): void { $p1->reject('a'); });
-        $p2 = new Promise(function () use (&$p2): void { $p2->resolve('b'); });
-        $p3 = new Promise(function () use (&$p3): void { $p3->resolve('c'); });
-        $p4 = new Promise(function () use (&$p4): void { $p4->reject('d'); });
-        $p5 = new Promise(function () use (&$p5): void { $p5->resolve('e'); });
-        $p6 = new Promise(function () use (&$p6): void { $p6->reject('f'); });
+        $p1 = new Promise(function () use (&$p1): void {
+            $p1->reject('a');
+        });
+        $p2 = new Promise(function () use (&$p2): void {
+            $p2->resolve('b');
+        });
+        $p3 = new Promise(function () use (&$p3): void {
+            $p3->resolve('c');
+        });
+        $p4 = new Promise(function () use (&$p4): void {
+            $p4->reject('d');
+        });
+        $p5 = new Promise(function () use (&$p5): void {
+            $p5->resolve('e');
+        });
+        $p6 = new Promise(function () use (&$p6): void {
+            $p6->reject('f');
+        });
 
         $co = P\Coroutine::of(function () use ($p1, $p2, $p3, $p4, $p5, $p6) {
             try {
@@ -716,9 +802,15 @@ class UtilsTest extends TestCase
 
     public function testCanManuallySettleTaskQueueGeneratedPromises(): void
     {
-        $p1 = P\Utils::task(function () { return 'a'; });
-        $p2 = P\Utils::task(function () { return 'b'; });
-        $p3 = P\Utils::task(function () { return 'c'; });
+        $p1 = P\Utils::task(function () {
+            return 'a';
+        });
+        $p2 = P\Utils::task(function () {
+            return 'b';
+        });
+        $p3 = P\Utils::task(function () {
+            return 'c';
+        });
 
         $p1->cancel();
         $p2->resolve('b2');

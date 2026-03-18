@@ -76,7 +76,9 @@ class EachPromiseTest extends TestCase
         $b = $this->createSelfResolvingPromise('b');
         $called = [];
         $each = new EachPromise([$a, $b], [
-            'fulfilled' => function ($value) use (&$called): void { $called[] = $value; },
+            'fulfilled' => function ($value) use (&$called): void {
+                $called[] = $value;
+            },
         ]);
         $p = $each->promise();
         $this->assertNull($p->wait());
@@ -88,7 +90,9 @@ class EachPromiseTest extends TestCase
     {
         $called = 0;
         $a = $this->createSelfResolvingPromise('a');
-        $b = new Promise(function (): void { $this->fail(); });
+        $b = new Promise(function (): void {
+            $this->fail();
+        });
         $each = new EachPromise([$a, $b], [
             'fulfilled' => function ($value, $idx, Promise $aggregate) use (&$called): void {
                 $this->assertSame($idx, 0);
@@ -176,9 +180,13 @@ class EachPromiseTest extends TestCase
             $called = true;
         });
         $each = new EachPromise([$a], [
-            'concurrency' => function () { return 1; },
-            'fulfilled' => function (): void {},
-            'rejected' => function (): void {},
+            'concurrency' => function () {
+                return 1;
+            },
+            'fulfilled' => function (): void {
+            },
+            'rejected' => function (): void {
+            },
         ]);
         $each->promise()->wait();
         $this->assertNull(PropertyHelper::get($each, 'onFulfilled'));
@@ -193,7 +201,9 @@ class EachPromiseTest extends TestCase
     {
         $called = false;
         $a = new FulfilledPromise('a');
-        $b = new Promise(function () use (&$called): void { $called = true; });
+        $b = new Promise(function () use (&$called): void {
+            $called = true;
+        });
         $each = new EachPromise([$a, $b], [
             'fulfilled' => function ($value, $idx, Promise $aggregate): void {
                 $aggregate->cancel();
@@ -246,8 +256,12 @@ class EachPromiseTest extends TestCase
         ]);
         $called = false;
         $each->promise()->then(
-            function () use (&$called): void { $called = true; },
-            function (): void { $this->fail('Should not have rejected.'); }
+            function () use (&$called): void {
+                $called = true;
+            },
+            function (): void {
+                $this->fail('Should not have rejected.');
+            }
         );
         $this->assertFalse($called);
         P\Utils::queue()->run();
@@ -260,7 +274,9 @@ class EachPromiseTest extends TestCase
         $called = [];
         $arr = ['a', 'b'];
         $each = new EachPromise($arr, [
-            'fulfilled' => function ($v) use (&$called): void { $called[] = $v; },
+            'fulfilled' => function ($v) use (&$called): void {
+                $called[] = $v;
+            },
         ]);
         $p = $each->promise();
         $this->assertNull($p->wait());
@@ -277,7 +293,9 @@ class EachPromiseTest extends TestCase
         $p = $each->promise();
         $e = null;
         $received = null;
-        $p->then(null, function ($reason) use (&$e): void { $e = $reason; });
+        $p->then(null, function ($reason) use (&$e): void {
+            $e = $reason;
+        });
         P\Utils::queue()->run();
         $this->assertInstanceOf(\Exception::class, $e);
         $this->assertSame('Failure', $e->getMessage());

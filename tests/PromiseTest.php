@@ -78,7 +78,8 @@ class PromiseTest extends TestCase
         $this->expectException(RejectionException::class);
         $this->expectExceptionMessage('The promise was rejected with reason: Invoking the wait callback did not resolve the promise');
 
-        $p = new Promise(function (): void {});
+        $p = new Promise(function (): void {
+        });
         $p->wait();
     }
 
@@ -244,9 +245,12 @@ class PromiseTest extends TestCase
         $p1 = new Promise(null, function () use (&$called): void {
             $called = true;
         });
-        $p2 = $p1->then(function (): void {});
-        $p3 = $p2->then(function (): void {});
-        $p4 = $p3->then(function (): void {});
+        $p2 = $p1->then(function (): void {
+        });
+        $p3 = $p2->then(function (): void {
+        });
+        $p4 = $p3->then(function (): void {
+        });
         $p3->cancel();
         $this->assertTrue(P\Is::rejected($p1));
         $this->assertTrue(P\Is::rejected($p2));

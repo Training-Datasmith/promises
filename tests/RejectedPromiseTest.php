@@ -92,7 +92,9 @@ class RejectedPromiseTest extends TestCase
     {
         $p = new RejectedPromise('a');
         $r = null;
-        $f = function ($reason) use (&$r): void { $r = $reason; };
+        $f = function ($reason) use (&$r): void {
+            $r = $reason;
+        };
         $p->then(null, $f);
         $this->assertNull($r);
         P\Utils::queue()->run();
@@ -102,7 +104,9 @@ class RejectedPromiseTest extends TestCase
     public function testReturnsNewRejectedWhenOnRejectedFails(): void
     {
         $p = new RejectedPromise('a');
-        $f = function (): void { throw new \Exception('b'); };
+        $f = function (): void {
+            throw new \Exception('b');
+        };
         $p2 = $p->then(null, $f);
         $this->assertNotSame($p, $p2);
         try {
@@ -123,7 +127,9 @@ class RejectedPromiseTest extends TestCase
     public function testOtherwiseIsSugarForRejections(): void
     {
         $p = new RejectedPromise('foo');
-        $p->otherwise(function ($v) use (&$c): void { $c = $v; });
+        $p->otherwise(function ($v) use (&$c): void {
+            $c = $v;
+        });
         P\Utils::queue()->run();
         $this->assertSame('foo', $c);
     }
@@ -144,7 +150,9 @@ class RejectedPromiseTest extends TestCase
     public function testDoesNotTryToRejectTwiceDuringTrampoline(): void
     {
         $fp = new RejectedPromise('a');
-        $t1 = $fp->then(null, function ($v) { return $v.' b'; });
+        $t1 = $fp->then(null, function ($v) {
+            return $v.' b';
+        });
         $t1->resolve('why!');
         $this->assertSame('why!', $t1->wait());
     }

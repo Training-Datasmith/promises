@@ -14,7 +14,9 @@ class CoroutineTest extends TestCase
 {
     public function testReturnsCoroutine(): void
     {
-        $fn = function () { yield 'foo'; };
+        $fn = function () {
+            yield 'foo';
+        };
         $this->assertInstanceOf(Coroutine::class, Coroutine::of($fn));
     }
 
@@ -26,7 +28,9 @@ class CoroutineTest extends TestCase
      */
     public function testShouldProxyPromiseMethodsToResultPromise($method, $args = []): void
     {
-        $coroutine = new Coroutine(function () { yield 0; });
+        $coroutine = new Coroutine(function () {
+            yield 0;
+        });
         $mockPromise = $this->getMockForAbstractClass(PromiseInterface::class);
         $mockPromise->expects($this->once())->method($method)->with(...$args);
 
@@ -45,7 +49,8 @@ class CoroutineTest extends TestCase
     {
         return [
             ['then', [null, null]],
-            ['otherwise', [function (): void {}]],
+            ['otherwise', [function (): void {
+            }]],
             ['wait', [true]],
             ['getState', []],
             ['resolve', [null]],
@@ -55,7 +60,9 @@ class CoroutineTest extends TestCase
 
     public function testShouldCancelResultPromiseAndOutsideCurrentPromise(): void
     {
-        $coroutine = new Coroutine(function () { yield 0; });
+        $coroutine = new Coroutine(function () {
+            yield 0;
+        });
 
         $mockPromises = [
             'result' => $this->getMockForAbstractClass(PromiseInterface::class),
