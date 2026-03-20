@@ -1,7 +1,9 @@
 {
     "name": "guzzlehttp/promises",
     "description": "Guzzle promises library",
-    "keywords": ["promise"],
+    "keywords": [
+        "promise"
+    ],
     "license": "MIT",
     "authors": [
         {
@@ -34,12 +36,12 @@
     },
     "autoload": {
         "psr-4": {
-            "GuzzleHttp\\Promise\\": "src/"
+            "Guzzle_Http\\Promise\\": "src/"
         }
     },
     "autoload-dev": {
         "psr-4": {
-            "GuzzleHttp\\Promise\\Tests\\": "tests/"
+            "Guzzle_Http\\Promise\\Tests\\": "tests/"
         }
     },
     "extra": {
