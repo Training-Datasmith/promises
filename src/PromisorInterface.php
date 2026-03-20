@@ -1,16 +1,15 @@
 <?php
 
-declare(strict_types=1);
-
-namespace GuzzleHttp\Promise;
+declare (strict_types=1);
+namespace Guzzle_Http\Promise;
 
 /**
  * Interface used with classes that return a promise.
  */
-interface PromisorInterface
+interface Promisor_Interface
 {
     /**
      * Returns a promise.
      */
-    public function promise(): PromiseInterface;
+    public function promise(): Promise_Interface;
 }

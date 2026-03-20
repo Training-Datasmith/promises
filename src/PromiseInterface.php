@@ -1,8 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
-namespace GuzzleHttp\Promise;
+declare (strict_types=1);
+namespace Guzzle_Http\Promise;
 
 /**
  * A promise represents the eventual result of an asynchronous operation.
@@ -13,12 +12,11 @@ namespace GuzzleHttp\Promise;
  *
  * @see https://promisesaplus.com/
  */
-interface PromiseInterface
+interface Promise_Interface
 {
     public const PENDING = 'pending';
     public const FULFILLED = 'fulfilled';
     public const REJECTED = 'rejected';
-
     /**
      * Appends fulfillment and rejection handlers to the promise, and returns
      * a new promise resolving to the return value of the called handler.
@@ -26,11 +24,7 @@ interface PromiseInterface
      * @param callable $onFulfilled Invoked when the promise fulfills.
      * @param callable $onRejected  Invoked when the promise is rejected.
      */
-    public function then(
-        ?callable $onFulfilled = null,
-        ?callable $onRejected = null
-    ): PromiseInterface;
-
+    public function then(?callable $on_fulfilled = null, ?callable $on_rejected = null): Promise_Interface;
     /**
      * Appends a rejection handler callback to the promise, and returns a new
      * promise resolving to the return value of the callback if it is called,
@@ -39,16 +33,14 @@ interface PromiseInterface
      *
      * @param callable $onRejected Invoked when the promise is rejected.
      */
-    public function otherwise(callable $onRejected): PromiseInterface;
-
+    public function otherwise(callable $on_rejected): Promise_Interface;
     /**
      * Get the state of the promise ("pending", "rejected", or "fulfilled").
      *
      * The three states can be checked against the constants defined on
      * PromiseInterface: PENDING, FULFILLED, and REJECTED.
      */
-    public function getState(): string;
-
+    public function get_state(): string;
     /**
      * Resolve the promise with the given value.
      *
@@ -57,7 +49,6 @@ interface PromiseInterface
      * @throws \RuntimeException if the promise is already resolved.
      */
     public function resolve($value): void;
-
     /**
      * Reject the promise with the given reason.
      *
@@ -66,14 +57,12 @@ interface PromiseInterface
      * @throws \RuntimeException if the promise is already resolved.
      */
     public function reject($reason): void;
-
     /**
      * Cancels the promise if possible.
      *
      * @see https://github.com/promises-aplus/cancellation-spec/issues/7
      */
     public function cancel(): void;
-
     /**
      * Waits until the promise completes if possible.
      *

@@ -1,8 +1,7 @@
 <?php
 
-declare(strict_types=1);
-
-namespace GuzzleHttp\Promise;
+declare (strict_types=1);
+namespace Guzzle_Http\Promise;
 
 /**
  * A task queue that executes tasks in a FIFO order.
@@ -15,36 +14,32 @@ namespace GuzzleHttp\Promise;
  *
  * @final
  */
-class TaskQueue implements TaskQueueInterface
+class Task_Queue implements Task_Queue_Interface
 {
-    private $enableShutdown = true;
+    private $enable_shutdown = true;
     private $queue = [];
-
-    public function __construct(bool $withShutdown = true)
+    public function __construct(bool $with_shutdown = true)
     {
-        if ($withShutdown) {
+        if ($with_shutdown) {
             register_shutdown_function(function (): void {
-                if ($this->enableShutdown) {
+                if ($this->enable_shutdown) {
                     // Only run the tasks if an E_ERROR didn't occur.
                     $err = error_get_last();
-                    if (!$err || ($err['type'] ^ E_ERROR)) {
+                    if (!$err || $err['type'] ^ E_ERROR) {
                         $this->run();
                     }
                 }
             });
         }
     }
-
-    public function isEmpty(): bool
+    public function is_empty(): bool
     {
         return !$this->queue;
     }
-
     public function add(callable $task): void
     {
         $this->queue[] = $task;
     }
-
     public function run(): void
     {
         while ($task = array_shift($this->queue)) {
@@ -52,7 +47,6 @@ class TaskQueue implements TaskQueueInterface
             $task();
         }
     }
-
     /**
      * The task queue will be run and exhausted by default when the process
      * exits IFF the exit is not the result of a PHP E_ERROR error.
@@ -64,8 +58,8 @@ class TaskQueue implements TaskQueueInterface
      *
      * Note: This shutdown will occur before any destructors are triggered.
      */
-    public function disableShutdown(): void
+    public function disable_shutdown(): void
     {
-        $this->enableShutdown = false;
+        $this->enable_shutdown = false;
     }
 }
