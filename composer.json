@@ -27,6 +27,13 @@
             "homepage": "https://github.com/Tobion"
         }
     ],
+    "repositories": [
+        {
+            "type": "composer",
+            "url": "https://raw.githubusercontent.com/Training-Datasmith/composer-index/remote-test-2026-11-09",
+            "canonical": false
+        }
+    ],
     "require": {
         "php": "^7.2.5 || ^8.0"
     },
@@ -43,6 +50,13 @@
         "psr-4": {
             "Guzzle_Http\\Promise\\Tests\\": "tests/"
         }
+    },
+    "scripts": {
+        "test": [
+            "@php scripts/check-rename-complete.php",
+            "@php scripts/check-cluster-pins.php",
+            "vendor/bin/phpunit --colors=never --do-not-cache-result"
+        ]
     },
     "extra": {
         "bamarni-bin": {

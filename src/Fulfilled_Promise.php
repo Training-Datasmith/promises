@@ -6,7 +6,7 @@ namespace Guzzle_Http\Promise;
 /**
  * A promise that has been fulfilled.
  *
- * Thenning off of this promise will invoke the onFulfilled callback
+ * Thenning off of this promise will invoke the on_fulfilled callback
  * immediately and ignore other callbacks.
  *
  * @final
@@ -20,13 +20,13 @@ class Fulfilled_Promise implements Promise_Interface
     public function __construct($value)
     {
         if (is_object($value) && method_exists($value, 'then')) {
-            throw new \InvalidArgumentException('You cannot create a FulfilledPromise with a promise.');
+            throw new \InvalidArgumentException('You cannot create a Fulfilled_Promise with a promise.');
         }
         $this->value = $value;
     }
     public function then(?callable $on_fulfilled = null, ?callable $on_rejected = null): Promise_Interface
     {
-        // Return itself if there is no onFulfilled function.
+        // Return itself if there is no on_fulfilled function.
         if (!$on_fulfilled) {
             return $this;
         }

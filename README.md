@@ -11,8 +11,8 @@ for a general introduction to promises.
 - [Cancellation](#cancellation)
 - [API](#api)
   - [Promise](#promise)
-  - [FulfilledPromise](#fulfilledpromise)
-  - [RejectedPromise](#rejectedpromise)
+  - [Fulfilled_Promise](#fulfilledpromise)
+  - [Rejected_Promise](#rejectedpromise)
 - [Promise interop](#promise-interop)
 - [Implementation notes](#implementation-notes)
 
@@ -26,7 +26,7 @@ for a general introduction to promises.
 - Promises can be cancelled.
 - Works with any object that has a `then` function.
 - C# style async/await coroutine promises using
-  `GuzzleHttp\Promise\Coroutine::of()`.
+  `Guzzle_Http\Promise\Coroutine::of()`.
 
 
 ## Installation
@@ -54,19 +54,19 @@ why the promise cannot be fulfilled.
 ### Callbacks
 
 Callbacks are registered with the `then` method by providing an optional 
-`$onFulfilled` followed by an optional `$onRejected` function.
+`$on_fulfilled` followed by an optional `$on_rejected` function.
 
 
 ```php
-use GuzzleHttp\Promise\Promise;
+use Guzzle_Http\Promise\Promise;
 
 $promise = new Promise();
 $promise->then(
-    // $onFulfilled
+    // $on_fulfilled
     function ($value) {
         echo 'The promise was fulfilled.';
     },
-    // $onRejected
+    // $on_rejected
     function ($reason) {
         echo 'The promise was rejected.';
     }
@@ -81,12 +81,12 @@ only once and in the order in which they were added.
 ### Resolving a Promise
 
 Promises are fulfilled using the `resolve($value)` method. Resolving a promise
-with any value other than a `GuzzleHttp\Promise\RejectedPromise` will trigger
-all of the onFulfilled callbacks (resolving a promise with a rejected promise
-will reject the promise and trigger the `$onRejected` callbacks).
+with any value other than a `Guzzle_Http\Promise\Rejected_Promise` will trigger
+all of the on_fulfilled callbacks (resolving a promise with a rejected promise
+will reject the promise and trigger the `$on_rejected` callbacks).
 
 ```php
-use GuzzleHttp\Promise\Promise;
+use Guzzle_Http\Promise\Promise;
 
 $promise = new Promise();
 $promise
@@ -100,7 +100,7 @@ $promise
         echo $value;
     });
 
-// Resolving the promise triggers the $onFulfilled callbacks and outputs
+// Resolving the promise triggers the $on_fulfilled callbacks and outputs
 // "Hello, reader."
 $promise->resolve('reader.');
 ```
@@ -115,7 +115,7 @@ has been fulfilled. The next promise in the chain will be invoked with the
 resolved value of the promise.
 
 ```php
-use GuzzleHttp\Promise\Promise;
+use Guzzle_Http\Promise\Promise;
 
 $promise = new Promise();
 $nextPromise = new Promise();
@@ -137,11 +137,11 @@ $nextPromise->resolve('B');
 
 ### Promise Rejection
 
-When a promise is rejected, the `$onRejected` callbacks are invoked with the
+When a promise is rejected, the `$on_rejected` callbacks are invoked with the
 rejection reason.
 
 ```php
-use GuzzleHttp\Promise\Promise;
+use Guzzle_Http\Promise\Promise;
 
 $promise = new Promise();
 $promise->then(null, function ($reason) {
@@ -154,11 +154,11 @@ $promise->reject('Error!');
 
 ### Rejection Forwarding
 
-If an exception is thrown in an `$onRejected` callback, subsequent
-`$onRejected` callbacks are invoked with the thrown exception as the reason.
+If an exception is thrown in an `$on_rejected` callback, subsequent
+`$on_rejected` callbacks are invoked with the thrown exception as the reason.
 
 ```php
-use GuzzleHttp\Promise\Promise;
+use Guzzle_Http\Promise\Promise;
 
 $promise = new Promise();
 $promise->then(null, function ($reason) {
@@ -171,16 +171,16 @@ $promise->reject('Error!');
 ```
 
 You can also forward a rejection down the promise chain by returning a
-`GuzzleHttp\Promise\RejectedPromise` in either an `$onFulfilled` or
-`$onRejected` callback.
+`Guzzle_Http\Promise\Rejected_Promise` in either an `$on_fulfilled` or
+`$on_rejected` callback.
 
 ```php
-use GuzzleHttp\Promise\Promise;
-use GuzzleHttp\Promise\RejectedPromise;
+use Guzzle_Http\Promise\Promise;
+use Guzzle_Http\Promise\Rejected_Promise;
 
 $promise = new Promise();
 $promise->then(null, function ($reason) {
-    return new RejectedPromise($reason);
+    return new Rejected_Promise($reason);
 })->then(null, function ($reason) {
     assert($reason === 'Error!');
 });
@@ -188,12 +188,12 @@ $promise->then(null, function ($reason) {
 $promise->reject('Error!');
 ```
 
-If an exception is not thrown in a `$onRejected` callback and the callback
-does not return a rejected promise, downstream `$onFulfilled` callbacks are
-invoked using the value returned from the `$onRejected` callback.
+If an exception is not thrown in a `$on_rejected` callback and the callback
+does not return a rejected promise, downstream `$on_fulfilled` callbacks are
+invoked using the value returned from the `$on_rejected` callback.
 
 ```php
-use GuzzleHttp\Promise\Promise;
+use Guzzle_Http\Promise\Promise;
 
 $promise = new Promise();
 $promise
@@ -249,8 +249,8 @@ echo $promise->wait(); // outputs "foo"
 
 Calling `wait` on a promise that has been rejected will throw an exception. If
 the rejection reason is an instance of `\Exception` the reason is thrown.
-Otherwise, a `GuzzleHttp\Promise\RejectionException` is thrown and the reason
-can be obtained by calling the `getReason` method of the exception.
+Otherwise, a `Guzzle_Http\Promise\Rejection_Exception` is thrown and the reason
+can be obtained by calling the `get_reason` method of the exception.
 
 ```php
 $promise = new Promise();
@@ -258,7 +258,7 @@ $promise->reject('foo');
 $promise->wait();
 ```
 
-> PHP Fatal error:  Uncaught exception 'GuzzleHttp\Promise\RejectionException' with message 'The promise was rejected with value: foo'
+> PHP Fatal error:  Uncaught exception 'Guzzle_Http\Promise\Rejection_Exception' with message 'The promise was rejected with value: foo'
 
 ### Unwrapping a Promise
 
@@ -299,14 +299,14 @@ of the promise.
 
 ### Promise
 
-When creating a promise object, you can provide an optional `$waitFn` and
-`$cancelFn`. `$waitFn` is a function that is invoked with no arguments and is
-expected to resolve the promise. `$cancelFn` is a function with no arguments
+When creating a promise object, you can provide an optional `$wait_fn` and
+`$cancel_fn`. `$wait_fn` is a function that is invoked with no arguments and is
+expected to resolve the promise. `$cancel_fn` is a function with no arguments
 that is expected to cancel the computation of a promise. It is invoked when the
 `cancel()` method of a promise is called.
 
 ```php
-use GuzzleHttp\Promise\Promise;
+use Guzzle_Http\Promise\Promise;
 
 $promise = new Promise(
     function () use (&$promise) {
@@ -323,11 +323,11 @@ assert('waited' === $promise->wait());
 
 A promise has the following methods:
 
-- `then(callable $onFulfilled, callable $onRejected) : PromiseInterface`
+- `then(callable $on_fulfilled, callable $on_rejected) : Promise_Interface`
   
   Appends fulfillment and rejection handlers to the promise, and returns a new promise resolving to the return value of the called handler.
 
-- `otherwise(callable $onRejected) : PromiseInterface`
+- `otherwise(callable $on_rejected) : Promise_Interface`
   
   Appends a rejection handler callback to the promise, and returns a new promise resolving to the return value of the callback if it is called, or to its original fulfillment value if the promise is instead fulfilled.
 
@@ -346,7 +346,7 @@ A promise has the following methods:
   cancelled. Any promises waiting on the cancelled promise to resolve will also
   be cancelled.
 
-- `getState() : string`
+- `get_state() : string`
 
   Returns the state of the promise. One of `pending`, `fulfilled`, or
   `rejected`.
@@ -360,15 +360,15 @@ A promise has the following methods:
   Rejects the promise with the given `$reason`.
 
 
-### FulfilledPromise
+### Fulfilled_Promise
 
 A fulfilled promise can be created to represent a promise that has been
 fulfilled.
 
 ```php
-use GuzzleHttp\Promise\FulfilledPromise;
+use Guzzle_Http\Promise\Fulfilled_Promise;
 
-$promise = new FulfilledPromise('value');
+$promise = new Fulfilled_Promise('value');
 
 // Fulfilled callbacks are immediately invoked.
 $promise->then(function ($value) {
@@ -377,15 +377,15 @@ $promise->then(function ($value) {
 ```
 
 
-### RejectedPromise
+### Rejected_Promise
 
 A rejected promise can be created to represent a promise that has been
 rejected.
 
 ```php
-use GuzzleHttp\Promise\RejectedPromise;
+use Guzzle_Http\Promise\Rejected_Promise;
 
-$promise = new RejectedPromise('Error');
+$promise = new Rejected_Promise('Error');
 
 // Rejected callbacks are immediately invoked.
 $promise->then(null, function ($reason) {
@@ -407,7 +407,7 @@ $deferred = new React\Promise\Deferred();
 $reactPromise = $deferred->promise();
 
 // Create a Guzzle promise that is fulfilled with a React promise.
-$guzzlePromise = new GuzzleHttp\Promise\Promise();
+$guzzlePromise = new Guzzle_Http\Promise\Promise();
 $guzzlePromise->then(function ($value) use ($reactPromise) {
     // Do something something with the value...
     // Return the React promise
@@ -434,7 +434,7 @@ instance.
 
 ```php
 // Get the global task queue
-$queue = GuzzleHttp\Promise\Utils::queue();
+$queue = Guzzle_Http\Promise\Utils::queue();
 $queue->run();
 ```
 
@@ -457,7 +457,7 @@ resolved iteratively, allowing for "infinite" then chaining.
 <?php
 require 'vendor/autoload.php';
 
-use GuzzleHttp\Promise\Promise;
+use Guzzle_Http\Promise\Promise;
 
 $parent = new Promise();
 $p = $parent;
@@ -521,20 +521,20 @@ your convenience:
 |----------------|----------------|
 | `queue` | `Utils::queue` |
 | `task` | `Utils::task` |
-| `promise_for` | `Create::promiseFor` |
-| `rejection_for` | `Create::rejectionFor` |
-| `exception_for` | `Create::exceptionFor` |
-| `iter_for` | `Create::iterFor` |
+| `promise_for` | `Create::promise_for` |
+| `rejection_for` | `Create::rejection_for` |
+| `exception_for` | `Create::exception_for` |
+| `iter_for` | `Create::iter_for` |
 | `inspect` | `Utils::inspect` |
-| `inspect_all` | `Utils::inspectAll` |
+| `inspect_all` | `Utils::inspect_all` |
 | `unwrap` | `Utils::unwrap` |
 | `all` | `Utils::all` |
 | `some` | `Utils::some` |
 | `any` | `Utils::any` |
 | `settle` | `Utils::settle` |
 | `each` | `Each::of` |
-| `each_limit` | `Each::ofLimit` |
-| `each_limit_all` | `Each::ofLimitAll` |
+| `each_limit` | `Each::of_limit` |
+| `each_limit_all` | `Each::of_limit_all` |
 | `!is_fulfilled` | `Is::pending` |
 | `is_fulfilled` | `Is::fulfilled` |
 | `is_rejected` | `Is::rejected` |

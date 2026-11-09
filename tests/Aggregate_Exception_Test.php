@@ -2,17 +2,17 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Promise\Tests;
+namespace Guzzle_Http\Promise\Tests;
 
-use GuzzleHttp\Promise\AggregateException;
+use Guzzle_Http\Promise\Aggregate_Exception;
 use PHPUnit\Framework\TestCase;
 
-class AggregateExceptionTest extends TestCase
+class Aggregate_Exception_Test extends TestCase
 {
     public function testHasReason(): void
     {
-        $e = new AggregateException('foo', ['baz', 'bar']);
+        $e = new Aggregate_Exception('foo', ['baz', 'bar']);
         $this->assertStringContainsString('foo', $e->getMessage());
-        $this->assertSame(['baz', 'bar'], $e->getReason());
+        $this->assertSame(['baz', 'bar'], $e->get_reason());
     }
 }

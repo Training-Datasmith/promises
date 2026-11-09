@@ -2,15 +2,15 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Promise\Tests;
+namespace Guzzle_Http\Promise\Tests;
 
-use GuzzleHttp\Promise\Coroutine;
-use GuzzleHttp\Promise\Promise;
-use GuzzleHttp\Promise\PromiseInterface;
+use Guzzle_Http\Promise\Coroutine;
+use Guzzle_Http\Promise\Promise;
+use Guzzle_Http\Promise\Promise_Interface;
 use PHPUnit\Framework\TestCase;
 use ReflectionClass;
 
-class CoroutineTest extends TestCase
+class Coroutine_Test extends TestCase
 {
     public function testReturnsCoroutine(): void
     {
@@ -31,7 +31,7 @@ class CoroutineTest extends TestCase
         $coroutine = new Coroutine(function () {
             yield 0;
         });
-        $mockPromise = $this->getMockForAbstractClass(PromiseInterface::class);
+        $mockPromise = $this->getMockForAbstractClass(Promise_Interface::class);
         $mockPromise->expects($this->once())->method($method)->with(...$args);
 
         $resultPromiseProp = (new ReflectionClass(Coroutine::class))->getProperty('result');
@@ -52,7 +52,7 @@ class CoroutineTest extends TestCase
             ['otherwise', [function (): void {
             }]],
             ['wait', [true]],
-            ['getState', []],
+            ['get_state', []],
             ['resolve', [null]],
             ['reject', [null]],
         ];
@@ -65,8 +65,8 @@ class CoroutineTest extends TestCase
         });
 
         $mockPromises = [
-            'result' => $this->getMockForAbstractClass(PromiseInterface::class),
-            'currentPromise' => $this->getMockForAbstractClass(PromiseInterface::class),
+            'result' => $this->getMockForAbstractClass(Promise_Interface::class),
+            'current_promise' => $this->getMockForAbstractClass(Promise_Interface::class),
         ];
         foreach ($mockPromises as $propName => $mockPromise) {
             /**

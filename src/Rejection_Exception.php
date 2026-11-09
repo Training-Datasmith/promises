@@ -6,7 +6,7 @@ namespace Guzzle_Http\Promise;
 /**
  * A special exception that is thrown when waiting on a rejected promise.
  *
- * The reason value is available via the getReason() method.
+ * The reason value is available via the get_reason() method.
  */
 class Rejection_Exception extends \RuntimeException
 {

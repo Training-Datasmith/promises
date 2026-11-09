@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Promise\Tests;
+namespace Guzzle_Http\Promise\Tests;
 
 class Thing2 implements \JsonSerializable
 {

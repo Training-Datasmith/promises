@@ -21,8 +21,8 @@ interface Promise_Interface
      * Appends fulfillment and rejection handlers to the promise, and returns
      * a new promise resolving to the return value of the called handler.
      *
-     * @param callable $onFulfilled Invoked when the promise fulfills.
-     * @param callable $onRejected  Invoked when the promise is rejected.
+     * @param callable $on_fulfilled Invoked when the promise fulfills.
+     * @param callable $on_rejected  Invoked when the promise is rejected.
      */
     public function then(?callable $on_fulfilled = null, ?callable $on_rejected = null): Promise_Interface;
     /**
@@ -31,14 +31,14 @@ interface Promise_Interface
      * or to its original fulfillment value if the promise is instead
      * fulfilled.
      *
-     * @param callable $onRejected Invoked when the promise is rejected.
+     * @param callable $on_rejected Invoked when the promise is rejected.
      */
     public function otherwise(callable $on_rejected): Promise_Interface;
     /**
      * Get the state of the promise ("pending", "rejected", or "fulfilled").
      *
      * The three states can be checked against the constants defined on
-     * PromiseInterface: PENDING, FULFILLED, and REJECTED.
+     * Promise_Interface: PENDING, FULFILLED, and REJECTED.
      */
     public function get_state(): string;
     /**

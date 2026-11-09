@@ -2,20 +2,20 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Promise\Tests;
+namespace Guzzle_Http\Promise\Tests;
 
-use GuzzleHttp\Promise as P;
-use GuzzleHttp\Promise\CancellationException;
-use GuzzleHttp\Promise\FulfilledPromise;
-use GuzzleHttp\Promise\Promise;
-use GuzzleHttp\Promise\RejectedPromise;
-use GuzzleHttp\Promise\RejectionException;
+use Guzzle_Http\Promise as P;
+use Guzzle_Http\Promise\Cancellation_Exception;
+use Guzzle_Http\Promise\Fulfilled_Promise;
+use Guzzle_Http\Promise\Promise;
+use Guzzle_Http\Promise\Rejected_Promise;
+use Guzzle_Http\Promise\Rejection_Exception;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \GuzzleHttp\Promise\Promise
+ * @covers \Guzzle_Http\Promise\Promise
  */
-class PromiseTest extends TestCase
+class Promise_Test extends TestCase
 {
     public function testCannotResolveNonPendingPromise(): void
     {
@@ -75,7 +75,7 @@ class PromiseTest extends TestCase
 
     public function testRejectsAndThrowsWhenWaitFailsToResolve(): void
     {
-        $this->expectException(RejectionException::class);
+        $this->expectException(Rejection_Exception::class);
         $this->expectExceptionMessage('The promise was rejected with reason: Invoking the wait callback did not resolve the promise');
 
         $p = new Promise(function (): void {
@@ -85,7 +85,7 @@ class PromiseTest extends TestCase
 
     public function testThrowsWhenUnwrapIsRejectedWithNonException(): void
     {
-        $this->expectException(RejectionException::class);
+        $this->expectException(Rejection_Exception::class);
         $this->expectExceptionMessage('The promise was rejected with reason: foo');
 
         $p = new Promise(function () use (&$p): void {
@@ -146,7 +146,7 @@ class PromiseTest extends TestCase
 
     public function testThrowsWhenWaitingOnPromiseWithNoWaitFunction(): void
     {
-        $this->expectException(RejectionException::class);
+        $this->expectException(Rejection_Exception::class);
 
         $p = new Promise();
         $p->wait();
@@ -173,14 +173,14 @@ class PromiseTest extends TestCase
             $p->reject('Foo!');
         });
         $p2 = $p->then(null, function ($reason) {
-            return new RejectedPromise([$reason]);
+            return new Rejected_Promise([$reason]);
         });
 
         try {
             $p2->wait();
             $this->fail('Should have thrown');
-        } catch (RejectionException $e) {
-            $this->assertSame(['Foo!'], $e->getReason());
+        } catch (Rejection_Exception $e) {
+            $this->assertSame(['Foo!'], $e->get_reason());
         }
     }
 
@@ -220,7 +220,7 @@ class PromiseTest extends TestCase
 
     public function testCancelsPromiseWhenNoCancelFunction(): void
     {
-        $this->expectException(CancellationException::class);
+        $this->expectException(Cancellation_Exception::class);
 
         $p = new Promise();
         $p->cancel();
@@ -261,14 +261,14 @@ class PromiseTest extends TestCase
         try {
             $p3->wait();
             $this->fail();
-        } catch (CancellationException $e) {
+        } catch (Cancellation_Exception $e) {
             $this->assertStringContainsString('cancelled', $e->getMessage());
         }
 
         try {
             $p4->wait();
             $this->fail();
-        } catch (CancellationException $e) {
+        } catch (Cancellation_Exception $e) {
             $this->assertStringContainsString('cancelled', $e->getMessage());
         }
 
@@ -356,7 +356,7 @@ class PromiseTest extends TestCase
         $p->resolve('foo');
         $p2 = $p->then();
         $this->assertNotSame($p, $p2);
-        $this->assertInstanceOf(FulfilledPromise::class, $p2);
+        $this->assertInstanceOf(Fulfilled_Promise::class, $p2);
     }
 
     public function testCreatesPromiseWhenRejectedAfterThen(): void
@@ -392,7 +392,7 @@ class PromiseTest extends TestCase
         $p->reject('foo');
         $p2 = $p->then();
         $this->assertNotSame($p, $p2);
-        $this->assertInstanceOf(RejectedPromise::class, $p2);
+        $this->assertInstanceOf(Rejected_Promise::class, $p2);
     }
 
     public function testInvokesWaitFnsForThens(): void
@@ -450,7 +450,7 @@ class PromiseTest extends TestCase
         $this->assertSame('foo2', $r2);
     }
 
-    public function testForwardsRejectedPromisesDownChainBetweenGaps(): void
+    public function testForwardsRejected_PromisesDownChainBetweenGaps(): void
     {
         $p = new Promise();
         $r = $r2 = null;
@@ -491,10 +491,10 @@ class PromiseTest extends TestCase
         $this->assertSame($e, $r2);
     }
 
-    public function testForwardsReturnedRejectedPromisesDownChainBetweenGaps(): void
+    public function testForwardsReturnedRejected_PromisesDownChainBetweenGaps(): void
     {
         $p = new Promise();
-        $rejected = new RejectedPromise('bar');
+        $rejected = new Rejected_Promise('bar');
         $r = $r2 = null;
         $p->then(null, null)
             ->then(null, function ($v) use (&$r, $rejected) {
@@ -514,8 +514,8 @@ class PromiseTest extends TestCase
         $this->assertSame('bar', $r2);
         try {
             $p->wait();
-        } catch (RejectionException $e) {
-            $this->assertSame('foo', $e->getReason());
+        } catch (Rejection_Exception $e) {
+            $this->assertSame('foo', $e->get_reason());
         }
     }
 
@@ -562,7 +562,7 @@ class PromiseTest extends TestCase
         $this->assertSame('a', $r);
     }
 
-    public function testForwardsHandlersWhenFulfilledPromiseIsReturned(): void
+    public function testForwardsHandlersWhenFulfilled_PromiseIsReturned(): void
     {
         $res = [];
         $p = new Promise();
@@ -589,7 +589,7 @@ class PromiseTest extends TestCase
         $this->assertSame(['A:foo', 'B', 'D:a', 'C:foo'], $res);
     }
 
-    public function testForwardsHandlersWhenRejectedPromiseIsReturned(): void
+    public function testForwardsHandlersWhenRejected_PromiseIsReturned(): void
     {
         $res = [];
         $p = new Promise();
@@ -614,7 +614,7 @@ class PromiseTest extends TestCase
         $this->assertSame(['A:foo', 'B', 'D:a', 'C:foo'], $res);
     }
 
-    public function testDoesNotForwardRejectedPromise(): void
+    public function testDoesNotForwardRejected_Promise(): void
     {
         $res = [];
         $p = new Promise();
@@ -670,7 +670,7 @@ class PromiseTest extends TestCase
     {
         $res = [];
         $p = new Promise();
-        $p2 = new NotPromiseInstance();
+        $p2 = new Not_Promise_Instance();
         $p2->then(function ($v) use (&$res): void {
             $res[] = 'A:'.$v;
         });

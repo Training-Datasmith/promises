@@ -22,7 +22,7 @@ src/
   Each.php                # Utilities for processing iterables of promises
   Each_Promise.php        # Promise that resolves when a set of promises complete
   Create.php              # Factory: creates promises from values, iterators, or exceptions
-  Is.php                  # Type predicates: isPending, isFulfilled, isRejected, isCancelled
+  Is.php                  # Type predicates: pending, fulfilled, rejected, settled
   Task_Queue.php          # Global FIFO queue for deferred microtask-style callbacks
   Task_Queue_Interface.php  # Contract for the task queue
   Utils.php               # Higher-level utilities: all(), any(), settle(), unwrap(), etc.
@@ -61,7 +61,7 @@ when a value is already known, avoiding overhead of the full `Promise` class.
 Create::promise_for($value)
   └─ Fulfilled_Promise (if scalar) or Promise (if callable/promise)
 
-Promise::then(onFulfilled, onRejected)
+Promise::then(on_fulfilled, on_rejected)
   └─ New Promise with handlers registered
        └─ Task_Queue::run() when parent settles
 

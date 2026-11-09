@@ -14,11 +14,11 @@ final class Utils
      *
      * <code>
      * while ($eventLoop->isRunning()) {
-     *     GuzzleHttp\Promise\Utils::queue()->run();
+     *     Guzzle_Http\Promise\Utils::queue()->run();
      * }
      * </code>
      *
-     * @param TaskQueueInterface|null $assign Optionally specify a new queue instance.
+     * @param Task_Queue_Interface|null $assign Optionally specify a new queue instance.
      */
     public static function queue(?Task_Queue_Interface $assign = null): Task_Queue_Interface
     {
@@ -61,7 +61,7 @@ final class Utils
      * promise. If the promise is rejected, the array will contain a "reason"
      * key mapping to the rejection reason of the promise.
      *
-     * @param PromiseInterface $promise Promise or value.
+     * @param Promise_Interface $promise Promise or value.
      */
     public static function inspect(Promise_Interface $promise): array
     {
@@ -81,7 +81,7 @@ final class Utils
      *
      * @see inspect for the inspection state array format.
      *
-     * @param PromiseInterface[] $promises Traversable of promises to wait upon.
+     * @param Promise_Interface[] $promises Traversable of promises to wait upon.
      */
     public static function inspect_all($promises): array
     {
@@ -98,7 +98,7 @@ final class Utils
      * order the promises were provided). An exception is thrown if any of the
      * promises are rejected.
      *
-     * @param iterable<PromiseInterface> $promises Iterable of PromiseInterface objects to wait on.
+     * @param iterable<Promise_Interface> $promises Iterable of Promise_Interface objects to wait on.
      *
      * @throws \Throwable on error
      */
@@ -154,7 +154,7 @@ final class Utils
      * is fulfilled with an array that contains the fulfillment values of the
      * winners in order of resolution.
      *
-     * This promise is rejected with a {@see AggregateException} if the number
+     * This promise is rejected with a {@see Aggregate_Exception} if the number
      * of fulfilled promises is less than the desired $count.
      *
      * @param int   $count    Total number of promises.

@@ -2,33 +2,33 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Promise\Tests;
+namespace Guzzle_Http\Promise\Tests;
 
-use GuzzleHttp\Promise as P;
-use GuzzleHttp\Promise\FulfilledPromise;
-use GuzzleHttp\Promise\Promise;
-use GuzzleHttp\Promise\RejectedPromise;
+use Guzzle_Http\Promise as P;
+use Guzzle_Http\Promise\Fulfilled_Promise;
+use Guzzle_Http\Promise\Promise;
+use Guzzle_Http\Promise\Rejected_Promise;
 use PHPUnit\Framework\TestCase;
 
-class IsTest extends TestCase
+class Is_Test extends TestCase
 {
     public function testKnowsIfFulfilled(): void
     {
-        $p = new FulfilledPromise(null);
+        $p = new Fulfilled_Promise(null);
         $this->assertTrue(P\Is::fulfilled($p));
         $this->assertFalse(P\Is::rejected($p));
     }
 
     public function testKnowsIfRejected(): void
     {
-        $p = new RejectedPromise(null);
+        $p = new Rejected_Promise(null);
         $this->assertTrue(P\Is::rejected($p));
         $this->assertFalse(P\Is::fulfilled($p));
     }
 
     public function testKnowsIfSettled(): void
     {
-        $p = new RejectedPromise(null);
+        $p = new Rejected_Promise(null);
         $this->assertTrue(P\Is::settled($p));
         $this->assertFalse(P\Is::pending($p));
     }

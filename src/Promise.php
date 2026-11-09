@@ -19,8 +19,8 @@ class Promise implements Promise_Interface
     private $wait_list;
     private $handlers = [];
     /**
-     * @param callable $waitFn   Fn that when invoked resolves the promise.
-     * @param callable $cancelFn Fn that when invoked cancels the promise.
+     * @param callable $wait_fn   Fn that when invoked resolves the promise.
+     * @param callable $cancel_fn Fn that when invoked cancels the promise.
      */
     public function __construct(?callable $wait_fn = null, ?callable $cancel_fn = null)
     {
@@ -154,7 +154,7 @@ class Promise implements Promise_Interface
      */
     private static function call_handler(int $index, $value, array $handler): void
     {
-        /** @var PromiseInterface $promise */
+        /** @var Promise_Interface $promise */
         $promise = $handler[0];
         // The promise may have been cancelled or resolved before placing
         // this thunk in the queue.

@@ -12,9 +12,9 @@ declare(strict_types=1);
  * used standalone for any deferred or asynchronous computation.
  */
 
-use GuzzleHttp\Promise\Promise;
-use GuzzleHttp\Promise\Utils;
-use GuzzleHttp\Promise\Create;
+use Guzzle_Http\Promise\Promise;
+use Guzzle_Http\Promise\Utils;
+use Guzzle_Http\Promise\Create;
 
 // --- Create and resolve a promise manually ---
 
@@ -35,9 +35,13 @@ $promise->resolve('Hello, World!');
 
 // --- Chain promises ---
 
-$result = Create::promiseFor('42')
-    ->then(fn(string $v): int => (int) $v)
-    ->then(fn(int $n): int => $n * 2);
+$result = Create::promise_for('42')
+    ->then(function (string $v): int {
+        return (int) $v;
+    })
+    ->then(function (int $n): int {
+        return $n * 2;
+    });
 
 echo $result->wait(); // 84
 
@@ -54,9 +58,9 @@ $rejected->reject(new \RuntimeException('Something went wrong'));
 // --- Wait for multiple promises (all must fulfill) ---
 
 $promises = [
-    'a' => Create::promiseFor(1),
-    'b' => Create::promiseFor(2),
-    'c' => Create::promiseFor(3),
+    'a' => Create::promise_for(1),
+    'b' => Create::promise_for(2),
+    'c' => Create::promise_for(3),
 ];
 
 $results = Utils::all($promises)->wait();
@@ -66,8 +70,8 @@ $results = Utils::all($promises)->wait();
 // --- Settle (get results regardless of fulfillment or rejection) ---
 
 $mixed = [
-    Create::promiseFor('ok'),
-    Create::rejectionFor(new \RuntimeException('fail')),
+    Create::promise_for('ok'),
+    Create::rejection_for(new \RuntimeException('fail')),
 ];
 
 $settled = Utils::settle($mixed)->wait();

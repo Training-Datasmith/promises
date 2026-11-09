@@ -10,11 +10,11 @@ final class Each
      * is fulfilled with a null value when the iterator has been consumed or
      * the aggregate promise has been fulfilled or rejected.
      *
-     * $onFulfilled is a function that accepts the fulfilled value, iterator
+     * $on_fulfilled is a function that accepts the fulfilled value, iterator
      * index, and the aggregate promise. The callback can invoke any necessary
      * side effects and choose to resolve or reject the aggregate if needed.
      *
-     * $onRejected is a function that accepts the rejection reason, iterator
+     * $on_rejected is a function that accepts the rejection reason, iterator
      * index, and the aggregate promise. The callback can invoke any necessary
      * side effects and choose to resolve or reject the aggregate if needed.
      *

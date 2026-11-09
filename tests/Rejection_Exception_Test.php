@@ -2,29 +2,29 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Promise\Tests;
+namespace Guzzle_Http\Promise\Tests;
 
-use GuzzleHttp\Promise\RejectionException;
+use Guzzle_Http\Promise\Rejection_Exception;
 use PHPUnit\Framework\TestCase;
 
 /**
- * @covers \GuzzleHttp\Promise\RejectionException
+ * @covers \Guzzle_Http\Promise\Rejection_Exception
  */
-class RejectionExceptionTest extends TestCase
+class Rejection_Exception_Test extends TestCase
 {
     public function testCanGetReasonFromException(): void
     {
         $thing = new Thing1('foo');
-        $e = new RejectionException($thing);
+        $e = new Rejection_Exception($thing);
 
-        $this->assertSame($thing, $e->getReason());
+        $this->assertSame($thing, $e->get_reason());
         $this->assertSame('The promise was rejected with reason: foo', $e->getMessage());
     }
 
     public function testCanGetReasonMessageFromJson(): void
     {
         $reason = new Thing2();
-        $e = new RejectionException($reason);
+        $e = new Rejection_Exception($reason);
         $this->assertStringContainsString('{}', $e->getMessage());
     }
 }

@@ -16,16 +16,16 @@ use Throwable;
  * This can lead to less verbose code when doing lots of sequential async calls
  * with minimal processing in between.
  *
- *     use GuzzleHttp\Promise;
+ *     use Guzzle_Http\Promise;
  *
- *     function createPromise($value) {
- *         return new Promise\FulfilledPromise($value);
+ *     function create_promise($value) {
+ *         return new Promise\Fulfilled_Promise($value);
  *     }
  *
  *     $promise = Promise\Coroutine::of(function () {
- *         $value = (yield createPromise('a'));
+ *         $value = (yield create_promise('a'));
  *         try {
- *             $value = (yield createPromise($value . 'b'));
+ *             $value = (yield create_promise($value . 'b'));
  *         } catch (\Throwable $e) {
  *             // The promise was rejected.
  *         }
@@ -44,7 +44,7 @@ use Throwable;
 final class Coroutine implements Promise_Interface
 {
     /**
-     * @var PromiseInterface|null
+     * @var Promise_Interface|null
      */
     private $current_promise;
     /**
@@ -107,7 +107,7 @@ final class Coroutine implements Promise_Interface
     }
     private function next_coroutine($yielded): void
     {
-        $this->current_promise = Create::promise_for($yielded)->then([$this, '_handleSuccess'], [$this, '_handleFailure']);
+        $this->current_promise = Create::promise_for($yielded)->then([$this, '_handle_success'], [$this, '_handle_failure']);
     }
     /**
      * @internal

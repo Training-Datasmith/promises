@@ -2,7 +2,7 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Promise\Tests;
+namespace Guzzle_Http\Promise\Tests;
 
 /**
  * A class to help get properties of an object.
@@ -11,7 +11,7 @@ namespace GuzzleHttp\Promise\Tests;
  *
  * @author Tobias Nyholm <tobias.nyholm@gmail.com>
  */
-class PropertyHelper
+class Property_Helper
 {
     /**
      * @param object $object

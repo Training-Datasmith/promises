@@ -1,6 +1,8 @@
 artifacts/
+.system-test/
 vendor/
 composer.lock
+*.phar
 phpunit.xml
 .php-cs-fixer.php
 .php-cs-fixer.cache

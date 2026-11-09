@@ -2,30 +2,30 @@
 
 declare(strict_types=1);
 
-namespace GuzzleHttp\Promise\Tests;
+namespace Guzzle_Http\Promise\Tests;
 
-use GuzzleHttp\Promise\TaskQueue;
+use Guzzle_Http\Promise\Task_Queue;
 use PHPUnit\Framework\TestCase;
 
-class TaskQueueTest extends TestCase
+class Task_Queue_Test extends TestCase
 {
     public function testKnowsIfEmpty(): void
     {
-        $tq = new TaskQueue(false);
-        $this->assertTrue($tq->isEmpty());
+        $tq = new Task_Queue(false);
+        $this->assertTrue($tq->is_empty());
     }
 
     public function testKnowsIfFull(): void
     {
-        $tq = new TaskQueue(false);
+        $tq = new Task_Queue(false);
         $tq->add(function (): void {
         });
-        $this->assertFalse($tq->isEmpty());
+        $this->assertFalse($tq->is_empty());
     }
 
     public function testExecutesTasksInOrder(): void
     {
-        $tq = new TaskQueue(false);
+        $tq = new Task_Queue(false);
         $called = [];
         $tq->add(function () use (&$called): void {
             $called[] = 'a';

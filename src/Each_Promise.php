@@ -177,7 +177,7 @@ class Each_Promise implements Promisor_Interface
         }
         unset($this->pending[$idx]);
         // Only refill pending promises if we are not locked, preventing the
-        // EachPromise to recursively invoke the provided iterator, which
+        // Each_Promise to recursively invoke the provided iterator, which
         // cause a fatal error: "Cannot resume an already running generator"
         if ($this->advance_iterator() && !$this->check_if_finished()) {
             // Add more pending promises if possible.
