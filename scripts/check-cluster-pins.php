@@ -70,11 +70,17 @@ function loadInstalledJsonPackages(string $path): array
  * @param array{versions: array<string, array<string, mixed>>} $installedPhp
  * @param array<string, array{name: string, source?: array{reference?: string}}> $installedJson
  */
-function verifyExpected(array $expectedMap, array $installedPhp, array $installedJson, $reportErrors = true): bool
+/**
+ * @param array<string, string>|null $errorMessages
+ */
+function verifyExpected(array $expectedMap, array $installedPhp, array $installedJson, $reportErrors = true, &$errorMessages = null): bool
 {
     $versions = $installedPhp['versions'] ?? [];
     $failed = false;
-    $stderr = static function ($message) use ($reportErrors): void {
+    $emit = static function ($message) use ($reportErrors, &$errorMessages): void {
+        if ($errorMessages !== null) {
+            $errorMessages[] = $message;
+        }
         if ($reportErrors) {
             fwrite(STDERR, $message);
         }
@@ -82,7 +88,7 @@ function verifyExpected(array $expectedMap, array $installedPhp, array $installe
 
     foreach ($expectedMap as $name => $want) {
         if (!isset($versions[$name])) {
-            $stderr(sprintf("check-cluster-pins: %s is not installed.\n", $name));
+            $emit(sprintf("check-cluster-pins: %s is not installed.\n", $name));
             $failed = true;
             continue;
         }
@@ -91,7 +97,7 @@ function verifyExpected(array $expectedMap, array $installedPhp, array $installe
         if (isset($want['alias'])) {
             $aliases = $pkg['aliases'] ?? [];
             if (!is_array($aliases) || !in_array($want['alias'], $aliases, true)) {
-                $stderr(sprintf(
+                $emit(sprintf(
                     "check-cluster-pins: %s alias mismatch (expected %s in aliases %s).\n",
                     $name,
                     $want['alias'],
@@ -103,10 +109,10 @@ function verifyExpected(array $expectedMap, array $installedPhp, array $installe
 
         $reference = $pkg['reference'] ?? null;
         if (!is_string($reference) || $reference === '') {
-            $stderr(sprintf("check-cluster-pins: %s has no reference in installed.php.\n", $name));
+            $emit(sprintf("check-cluster-pins: %s has no reference in installed.php.\n", $name));
             $failed = true;
         } elseif (!hash_equals($want['reference'], $reference)) {
-            $stderr(sprintf(
+            $emit(sprintf(
                 "check-cluster-pins: %s installed.php reference mismatch (expected %s, got %s).\n",
                 $name,
                 $want['reference'],
@@ -116,17 +122,17 @@ function verifyExpected(array $expectedMap, array $installedPhp, array $installe
         }
 
         if (!isset($installedJson[$name])) {
-            $stderr(sprintf("check-cluster-pins: %s is missing from installed.json.\n", $name));
+            $emit(sprintf("check-cluster-pins: %s is missing from installed.json.\n", $name));
             $failed = true;
             continue;
         }
 
         $jsonRef = $installedJson[$name]['source']['reference'] ?? null;
         if (!is_string($jsonRef) || $jsonRef === '') {
-            $stderr(sprintf("check-cluster-pins: %s has no source.reference in installed.json.\n", $name));
+            $emit(sprintf("check-cluster-pins: %s has no source.reference in installed.json.\n", $name));
             $failed = true;
         } elseif (!hash_equals($want['reference'], $jsonRef)) {
-            $stderr(sprintf(
+            $emit(sprintf(
                 "check-cluster-pins: %s installed.json source.reference mismatch (expected %s, got %s).\n",
                 $name,
                 $want['reference'],
@@ -182,12 +188,34 @@ function verifyPhpunitGapGuard(array $installedPhp): bool
     return true;
 }
 
+function errorMatchesInstalledPhpMismatch(array $errorMessages): bool
+{
+    foreach ($errorMessages as $message) {
+        if (strpos($message, 'installed.php reference mismatch') !== false) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
+function errorMatchesInstalledJsonMismatch(array $errorMessages): bool
+{
+    foreach ($errorMessages as $message) {
+        if (strpos($message, 'installed.json source.reference mismatch') !== false) {
+            return true;
+        }
+    }
+
+    return false;
+}
+
 function runWrongShaDemo(): bool
 {
     $goodRef = str_repeat('a', 40);
     $badRef = str_repeat('b', 40);
 
-    $installedPhp = [
+    $installedPhpGood = [
         'versions' => [
             'example/pkg' => [
                 'reference' => $goodRef,
@@ -196,7 +224,7 @@ function runWrongShaDemo(): bool
         ],
     ];
 
-    $installedJson = [
+    $installedJsonGood = [
         'example/pkg' => [
             'name' => 'example/pkg',
             'source' => ['reference' => $goodRef],
@@ -207,27 +235,48 @@ function runWrongShaDemo(): bool
         'example/pkg' => ['reference' => $goodRef, 'alias' => '1.2.3'],
     ];
 
-    $expectedBad = [
-        'example/pkg' => ['reference' => $badRef, 'alias' => '1.2.3'],
-    ];
+    $installedPhpBad = $installedPhpGood;
+    $installedPhpBad['versions']['example/pkg']['reference'] = $badRef;
 
-    if (verifyExpected($expectedBad, $installedPhp, $installedJson, false)) {
-        fwrite(STDERR, "check-cluster-pins: wrong-SHA demo failed to detect installed.php mismatch.\n");
+    $errors = [];
+    if (verifyExpected($expectedGood, $installedPhpBad, $installedJsonGood, false, $errors)) {
+        fwrite(STDERR, "check-cluster-pins: wrong-SHA demo failed to reject installed.php-only mutation.\n");
+
+        return false;
+    }
+    if (!errorMatchesInstalledPhpMismatch($errors)) {
+        fwrite(STDERR, "check-cluster-pins: wrong-SHA demo did not report installed.php reference mismatch.\n");
+
+        return false;
+    }
+    if (errorMatchesInstalledJsonMismatch($errors)) {
+        fwrite(STDERR, "check-cluster-pins: wrong-SHA demo must not report installed.json mismatch for installed.php-only mutation.\n");
 
         return false;
     }
 
-    if (!verifyExpected($expectedGood, $installedPhp, $installedJson, false)) {
-        fwrite(STDERR, "check-cluster-pins: wrong-SHA demo fixture must pass with good SHAs.\n");
-
-        return false;
-    }
-
-    $installedJsonBad = $installedJson;
+    $installedJsonBad = $installedJsonGood;
     $installedJsonBad['example/pkg']['source']['reference'] = $badRef;
 
-    if (verifyExpected($expectedGood, $installedPhp, $installedJsonBad, false)) {
-        fwrite(STDERR, "check-cluster-pins: wrong-SHA demo failed to detect installed.json mismatch.\n");
+    $errors = [];
+    if (verifyExpected($expectedGood, $installedPhpGood, $installedJsonBad, false, $errors)) {
+        fwrite(STDERR, "check-cluster-pins: wrong-SHA demo failed to reject installed.json-only mutation.\n");
+
+        return false;
+    }
+    if (!errorMatchesInstalledJsonMismatch($errors)) {
+        fwrite(STDERR, "check-cluster-pins: wrong-SHA demo did not report installed.json source.reference mismatch.\n");
+
+        return false;
+    }
+    if (errorMatchesInstalledPhpMismatch($errors)) {
+        fwrite(STDERR, "check-cluster-pins: wrong-SHA demo must not report installed.php mismatch for installed.json-only mutation.\n");
+
+        return false;
+    }
+
+    if (!verifyExpected($expectedGood, $installedPhpGood, $installedJsonGood, false)) {
+        fwrite(STDERR, "check-cluster-pins: wrong-SHA demo fixture must pass with matching SHAs.\n");
 
         return false;
     }
